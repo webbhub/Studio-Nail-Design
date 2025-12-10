@@ -69,18 +69,764 @@
         transform: scale(1.1);
       }
     </style>
-  <script type="importmap">
+    
+    <!-- Import Map for React dependencies -->
+    <script type="importmap">
 {
   "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.1/",
-    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "react": "https://esm.sh/react@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "lucide-react": "https://esm.sh/lucide-react@0.263.1",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0"
+    "react/": "https://aistudiocdn.com/react@^19.2.1/"
   }
 }
 </script>
-</head>
+    <!-- Babel Standalone to compile JSX in browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
   <body class="bg-background text-gray-800 antialiased overflow-x-hidden selection:bg-accent selection:text-primary">
     <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+      import React, { useState, useEffect, useCallback } from 'react';
+      import ReactDOM from 'react-dom/client';
+      import { Menu, X, Instagram, Phone, MapPin, Quote, ChevronLeft, ChevronRight, Star, Facebook, MessageCircle } from 'lucide-react';
+
+      // --- COMPONENTES ---
+
+      // Componente: Navbar
+      const Navbar = () => {
+        const [isOpen, setIsOpen] = useState(false);
+        const [isScrolled, setIsScrolled] = useState(false);
+
+        const navItems = [
+          { label: 'Início', href: '#hero' },
+          { label: 'O Studio', href: '#about' },
+          { label: 'Serviços', href: '#services' },
+          { label: 'Galeria', href: '#gallery' },
+          { label: 'Contato', href: '#contact' },
+        ];
+
+        useEffect(() => {
+          const handleScroll = () => {
+            setIsScrolled(window.scrollY > 40);
+          };
+          window.addEventListener('scroll', handleScroll);
+          return () => window.removeEventListener('scroll', handleScroll);
+        }, []);
+
+        const handleNavClick = (e, href) => {
+          e.preventDefault();
+          const targetId = href.replace('#', '');
+          const element = document.getElementById(targetId);
+          
+          if (element) {
+            setIsOpen(false);
+            element.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        };
+
+        return (
+          <>
+            {/* Top Bar */}
+            <div className="bg-black text-white py-2 text-[10px] md:text-xs tracking-widest uppercase hidden md:block">
+              <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+                  <div className="flex items-center gap-6">
+                      <span className="flex items-center gap-2"><MapPin size={12} /> Av. Principal, 1000 - Centro, SP</span>
+                      <span className="flex items-center gap-2"><Phone size={12} /> (11) 99999-9999</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-secondary transition-colors"><Instagram size={14} /></a>
+                      <span>Siga-nos</span>
+                  </div>
+              </div>
+            </div>
+
+            {/* Main Navbar */}
+            <nav 
+              className={`fixed w-full z-50 transition-all duration-500 border-b border-gray-100 ${
+                isScrolled ? 'top-0 bg-white/95 backdrop-blur-md shadow-sm py-2' : 'md:top-[33px] top-0 bg-white py-4'
+              }`}
+            >
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-between items-center h-16 md:h-20">
+                  
+                  {/* Mobile Menu Button */}
+                  <div className="md:hidden flex items-center">
+                    <button onClick={() => setIsOpen(!isOpen)} className="text-primary focus:outline-none">
+                      {isOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+                  </div>
+
+                  {/* Logo */}
+                  <a 
+                    href="#hero" 
+                    onClick={(e) => handleNavClick(e, '#hero')}
+                    className="flex flex-col items-center group"
+                  >
+                      <h1 className="font-serif text-2xl md:text-3xl text-primary font-medium tracking-[0.15em] uppercase">
+                        Studio<span className="text-secondary font-bold">Elegance</span>
+                      </h1>
+                      <span className="text-[9px] md:text-[10px] text-gray-400 tracking-[0.4em] uppercase group-hover:text-secondary transition-colors">
+                        Beauty Academy
+                      </span>
+                  </a>
+
+                  {/* Desktop Navigation */}
+                  <div className="hidden md:flex items-center space-x-8 lg:space-x-12">
+                    {navItems.map((item) => (
+                      <a
+                        key={item.label}
+                        href={item.href}
+                        onClick={(e) => handleNavClick(e, item.href)}
+                        className="text-xs font-medium text-gray-500 hover:text-black hover:font-semibold transition-all duration-300 uppercase tracking-widest relative group cursor-pointer"
+                      >
+                        {item.label}
+                        <span className="absolute -bottom-2 left-1/2 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                      </a>
+                    ))}
+                    <a 
+                      href="#contact"
+                      onClick={(e) => handleNavClick(e, '#contact')}
+                      className="bg-primary text-white hover:bg-secondary px-8 py-3 text-xs font-bold uppercase tracking-widest transition-all duration-300 rounded-none shadow-sm cursor-pointer"
+                    >
+                      Agendar
+                    </a>
+                  </div>
+
+                   <div className="md:hidden w-6"></div>
+                </div>
+              </div>
+
+              {/* Mobile Menu */}
+              <div 
+                className={`md:hidden absolute top-full left-0 w-full bg-white shadow-xl transition-all duration-300 overflow-hidden ${
+                  isOpen ? 'max-h-screen py-6 border-t' : 'max-h-0'
+                }`}
+              >
+                <div className="flex flex-col items-center space-y-4">
+                  {navItems.map((item) => (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      onClick={(e) => handleNavClick(e, item.href)}
+                      className="text-sm font-medium text-gray-600 hover:text-secondary uppercase tracking-widest cursor-pointer"
+                    >
+                      {item.label}
+                    </a>
+                  ))}
+                  <a
+                     href="#contact"
+                     onClick={(e) => handleNavClick(e, '#contact')}
+                     className="bg-primary text-white px-8 py-3 text-xs font-bold uppercase tracking-widest mt-4 cursor-pointer"
+                  >
+                    Agendar
+                  </a>
+                </div>
+              </div>
+            </nav>
+          </>
+        );
+      };
+
+      // Componente: Hero
+      const Hero = () => {
+        const handleNavClick = (e, href) => {
+          e.preventDefault();
+          const targetId = href.replace('#', '');
+          const element = document.getElementById(targetId);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        };
+
+        return (
+          <section id="hero" className="relative h-[90vh] md:h-screen flex items-center justify-center overflow-hidden bg-[#FDFBF7]">
+            <div className="absolute inset-0 z-0">
+              <img 
+                src="https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=2070&auto=format&fit=crop" 
+                alt="Woman hands with elegant manicure" 
+                className="w-full h-full object-cover opacity-80"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/40 to-transparent"></div>
+            </div>
+
+            <div className="relative z-10 container mx-auto px-6 md:px-12 flex items-center h-full">
+              <div className="max-w-2xl text-left mt-20">
+                <div className="flex items-center gap-4 mb-6 animate-[fadeIn_1s_ease-out]">
+                  <div className="h-[1px] w-12 bg-black"></div>
+                  <span className="text-primary text-xs md:text-sm tracking-[0.3em] uppercase font-semibold">
+                    Especialista em Nail Design
+                  </span>
+                </div>
+                
+                <h2 className="font-serif text-5xl md:text-7xl lg:text-8xl text-primary leading-none mb-8 animate-[slideUp_1s_ease-out_0.2s_both]">
+                  Realce sua <br/>
+                  <span className="italic text-secondary font-light">Beleza Natural</span>
+                </h2>
+                
+                <p className="font-sans text-gray-600 text-lg leading-relaxed max-w-lg mb-10 animate-[slideUp_1s_ease-out_0.4s_both]">
+                  O Studio de unhas Nº1 em São Paulo. Experiência única de cuidado, design e sofisticação para mulheres exigentes.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 animate-[slideUp_1s_ease-out_0.6s_both]">
+                  <a 
+                    href="#contact" 
+                    onClick={(e) => handleNavClick(e, '#contact')}
+                    className="bg-black text-white hover:bg-secondary px-10 py-4 text-sm font-bold uppercase tracking-[0.2em] transition-all duration-300 text-center cursor-pointer"
+                  >
+                    Agendar Horário
+                  </a>
+                  <a 
+                    href="#about" 
+                    onClick={(e) => handleNavClick(e, '#about')}
+                    className="border border-black text-black hover:bg-black hover:text-white px-10 py-4 text-sm font-bold uppercase tracking-[0.2em] transition-all duration-300 text-center cursor-pointer"
+                  >
+                    Conheça o Studio
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      // Componente: Features (Sobre) - COM NOVAS IMAGENS
+      const Features = () => {
+        return (
+          <section id="about" className="py-24 bg-white overflow-hidden scroll-mt-28">
+            <div className="max-w-7xl mx-auto px-6 lg:px-8">
+              
+              <div className="flex flex-col lg:flex-row items-center gap-16">
+                
+                {/* Text Content */}
+                <div className="lg:w-1/2 animate-on-scroll opacity-0">
+                  <h3 className="text-secondary text-sm font-bold tracking-[0.2em] uppercase mb-4">Conheça o Studio</h3>
+                  <h2 className="font-serif text-4xl md:text-5xl text-primary leading-tight mb-8">
+                    Studio Elegance <br/>
+                    <span className="italic font-light">Beauty Academy</span>
+                  </h2>
+                  <div className="w-20 h-[1px] bg-secondary mb-8"></div>
+                  
+                  <div className="space-y-6 text-gray-500 font-sans leading-relaxed text-sm md:text-base text-justify">
+                    <p>
+                      O Studio Elegance Beauty Academy, localizado no coração de São Paulo, foi fundado com o propósito de elevar o padrão do nail design. 
+                      Nossa filosofia une técnicas internacionais de vanguarda com um atendimento personalizado que entende a singularidade de cada cliente.
+                    </p>
+                    <p>
+                      Especializados em alongamentos de fibra de vidro, gel e cutilagem russa, nosso espaço foi projetado para ser um refúgio de tranquilidade em meio à cidade.
+                      Utilizamos exclusivamente produtos importados e seguimos rigorosos protocolos de biossegurança hospitalar.
+                    </p>
+                    <p>
+                      Seja para uma ocasião especial ou para o cuidado semanal, estamos prontas para transformar suas unhas em verdadeiras obras de arte.
+                    </p>
+                  </div>
+
+                  <div className="mt-10 grid grid-cols-2 gap-8">
+                      <div>
+                          <span className="block text-3xl font-serif text-primary">5k+</span>
+                          <span className="text-xs uppercase tracking-widest text-gray-400">Clientes Atendidas</span>
+                      </div>
+                      <div>
+                          <span className="block text-3xl font-serif text-primary">8</span>
+                          <span className="text-xs uppercase tracking-widest text-gray-400">Anos de Experiência</span>
+                      </div>
+                  </div>
+                </div>
+
+                {/* Image Composition */}
+                <div className="lg:w-1/2 relative h-[500px] w-full animate-on-scroll opacity-0 delay-200">
+                   {/* Main Image */}
+                   <div className="absolute top-0 right-0 w-[70%] h-[85%] rounded-t-full rounded-b-lg overflow-hidden shadow-2xl z-10">
+                      <img 
+                        src="https://i.postimg.cc/Qd7N4gtC/ultimas-5-pautas-APLICACAO-DE-ALONGAMENTO-DE-CILIOS-X-TRUQUES-PARA-MAXIMIZAR-OS-RESULTADOS.webp" 
+                        alt="Nail Designer applying polish" 
+                        className="w-full h-full object-cover"
+                      />
+                   </div>
+                   
+                   {/* Secondary Image */}
+                   <div className="absolute bottom-0 left-0 w-[55%] h-[60%] bg-white p-2 rounded-lg shadow-xl z-20">
+                      <img 
+                        src="https://i.postimg.cc/8P2N6FH1/images-(3).jpg" 
+                        alt="Golden manicure tools" 
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                   </div>
+
+                   {/* Decorative Circle */}
+                   <div className="absolute top-10 left-10 w-24 h-24 rounded-full border border-secondary/30 z-0"></div>
+                </div>
+
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      // Componente: Services
+      const Services = () => {
+        const services = [
+          { 
+            id: 1, 
+            title: 'Nail Designer', 
+            image: 'https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=800&auto=format&fit=crop',
+            subtitle: 'Alongamentos e Arte'
+          },
+          { 
+            id: 2, 
+            title: 'Manicure & Pedicure', 
+            image: 'https://i.postimg.cc/MK4nHKNf/boa-manicure-pedicure.jpg',
+            subtitle: 'Cuidado Clássico'
+          },
+          { 
+            id: 3, 
+            title: 'Spa dos Pés', 
+            image: 'https://i.postimg.cc/KvgZ97pX/e08036-34584ba23b2346e58d40c7169d70b3ca-mv2.avif',
+            subtitle: 'Relaxamento Total'
+          },
+          { 
+            id: 4, 
+            title: 'Extensão de Cílios', 
+            image: 'https://i.postimg.cc/TPk18dVP/1-extensao-de-cilios-29105910.webp',
+            subtitle: 'Olhar Marcante'
+          },
+          { 
+            id: 5, 
+            title: 'Design de Sobrancelha', 
+            image: 'https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=800&auto=format&fit=crop',
+            subtitle: 'Harmonia Facial'
+          },
+          { 
+            id: 6, 
+            title: 'Cursos VIP', 
+            image: 'https://i.postimg.cc/5ysFnBsR/6de313-231e62d746774df084dac58fc29f2e8e-mv2.avif',
+            subtitle: 'Aprenda Conosco'
+          },
+        ];
+
+        const handleNavClick = (e, href) => {
+          e.preventDefault();
+          const targetId = href.replace('#', '');
+          const element = document.getElementById(targetId);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        };
+
+        return (
+          <section id="services" className="py-24 bg-surface scroll-mt-28">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              
+              <div className="text-center mb-16 animate-on-scroll opacity-0">
+                <h2 className="font-serif text-4xl md:text-5xl text-primary font-medium tracking-wide uppercase mb-3">
+                  Nossos <span className="text-secondary font-bold">Serviços</span>
+                </h2>
+                <div className="w-16 h-[2px] bg-primary mx-auto"></div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {services.map((service, index) => (
+                  <div 
+                    key={service.id} 
+                    className="group relative h-64 overflow-hidden rounded-lg shadow-lg cursor-pointer animate-on-scroll opacity-0"
+                    style={{ transitionDelay: `${index * 100}ms` }}
+                  >
+                    <img 
+                      src={service.image} 
+                      alt={service.title} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 filter brightness-[0.7] group-hover:brightness-[0.4]"
+                    />
+                    
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
+                      <div className="w-[80%] h-[80%] border border-white/30 flex flex-col items-center justify-center transition-all duration-500 group-hover:border-white/80 group-hover:bg-white/5 relative">
+                          
+                          <h3 className="font-serif text-xl text-white tracking-widest uppercase mb-2 drop-shadow-md">
+                              {service.title}
+                          </h3>
+                          
+                          <div className="w-8 h-[1px] bg-secondary mb-2 transition-all duration-300 group-hover:w-16"></div>
+                          
+                          <p className="font-sans text-xs text-gray-200 uppercase tracking-wider opacity-0 transform translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+                              {service.subtitle}
+                          </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-16 text-center animate-on-scroll opacity-0">
+                   <h3 className="font-serif text-2xl text-primary mb-6">Pronta para transformar seu visual?</h3>
+                   <a 
+                    href="#contact" 
+                    onClick={(e) => handleNavClick(e, '#contact')}
+                    className="inline-block border border-black text-black hover:bg-black hover:text-white px-12 py-3 uppercase tracking-[0.2em] text-xs font-bold transition-all duration-300 cursor-pointer"
+                  >
+                    Consultar Tabela de Preços
+                  </a>
+              </div>
+
+            </div>
+          </section>
+        );
+      };
+
+      // Componente: Gallery
+      const Gallery = () => {
+        const images = [
+          { src: "https://i.postimg.cc/VNFGmTv5/2a8a83f4-6000af82bf684-whatsapp-image-2021-01-14-at-09-21-34-1.jpg", span: "md:col-span-1 md:row-span-2" },
+          { src: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=600&auto=format&fit=crop", span: "md:col-span-1 md:row-span-1" },
+          { src: "https://i.postimg.cc/5ymN3f2V/foto-da-unha.png", span: "md:col-span-1 md:row-span-1" },
+          { src: "https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=800&auto=format&fit=crop", span: "md:col-span-2 md:row-span-1" },
+          { src: "https://i.postimg.cc/9MZfDd3H/images-(2).jpg", span: "md:col-span-1 md:row-span-1" }
+        ];
+
+        return (
+          <section id="gallery" className="py-24 bg-white scroll-mt-28">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12 animate-on-scroll opacity-0">
+                <span className="text-xs font-bold tracking-[0.3em] text-gray-400 uppercase">Nosso Portfolio</span>
+                <h2 className="font-serif text-4xl md:text-5xl text-primary mt-2">Galeria Elegance</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[250px] mb-12">
+                {images.map((img, index) => (
+                  <div 
+                    key={index} 
+                    className={`relative overflow-hidden rounded-sm group ${img.span} animate-on-scroll opacity-0`}
+                    style={{ transitionDelay: `${index * 100}ms` }}
+                  >
+                    <img 
+                      src={img.src} 
+                      alt="Nail Art" 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                       <Instagram className="text-white w-8 h-8" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="flex justify-center">
+                 <a href="#" className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-xs border-b border-secondary pb-1 hover:text-secondary transition-colors">
+                    Siga @studioelegance
+                 </a>
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      // Componente: Testimonials (Carrossel)
+      const Testimonials = () => {
+        const testimonialsData = [
+          {
+            id: 1,
+            name: "Inês Narciso",
+            role: "Cliente desde 2021",
+            text: "O ambiente é incrível e as profissionais super atenciosas. Fiz alongamento em fibra e a naturalidade me surpreendeu. Não troco por nada!",
+            rating: 5.0,
+            image: "https://i.postimg.cc/NFkZVMX9/rosoto-muie.png"
+          },
+          {
+            id: 2,
+            name: "Camila Rocha",
+            role: "Cliente VIP",
+            text: "A durabilidade do trabalho é impecável. Faço minhas unhas a cada 20 dias e o brilho do gel continua intacto. O melhor investimento para minha autoestima.",
+            rating: 5.0,
+            image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop"
+          },
+          {
+            id: 3,
+            name: "Beatriz Silva",
+            role: "Noiva Elegance",
+            text: "Escolhi o Studio Elegance para o meu casamento e foi a melhor decisão. Fizeram uma Nail Art delicada e luxuosa, exatamente como eu sonhei.",
+            rating: 5.0,
+            image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?q=80&w=1000&auto=format&fit=crop"
+          }
+        ];
+
+        const [currentIndex, setCurrentIndex] = useState(0);
+        const [isAnimating, setIsAnimating] = useState(false);
+
+        const nextSlide = useCallback(() => {
+          if (isAnimating) return;
+          setIsAnimating(true);
+          setTimeout(() => setIsAnimating(false), 500);
+          setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonialsData.length);
+        }, [isAnimating]);
+
+        const prevSlide = () => {
+          if (isAnimating) return;
+          setIsAnimating(true);
+          setTimeout(() => setIsAnimating(false), 500);
+          setCurrentIndex((prevIndex) => (prevIndex - 1 + testimonialsData.length) % testimonialsData.length);
+        };
+
+        const goToSlide = (index) => {
+          if (index === currentIndex || isAnimating) return;
+          setIsAnimating(true);
+          setTimeout(() => setIsAnimating(false), 500);
+          setCurrentIndex(index);
+        };
+
+        useEffect(() => {
+          const interval = setInterval(() => {
+            nextSlide();
+          }, 6000);
+          return () => clearInterval(interval);
+        }, [nextSlide]);
+
+        const currentTestimonial = testimonialsData[currentIndex];
+
+        return (
+          <section id="testimonials" className="py-24 bg-[#111] text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/10 rounded-full filter blur-[100px]"></div>
+            
+            <div className="max-w-6xl mx-auto px-6 relative z-10">
+              
+              <div className="text-center mb-16 animate-on-scroll opacity-0">
+                 <h2 className="font-serif text-3xl md:text-4xl text-white mb-4">Depoimentos</h2>
+                 <p className="text-gray-400 font-light tracking-wide">O que nossas clientes dizem sobre a experiência.</p>
+              </div>
+
+              <div className="relative">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center min-h-[450px]">
+                      
+                      {/* Featured Image */}
+                      <div className={`relative transition-opacity duration-500 ${isAnimating ? 'opacity-50' : 'opacity-100'}`}>
+                         <div className="relative overflow-hidden rounded-sm h-[400px] w-full group">
+                           <img 
+                             src={currentTestimonial.image} 
+                             alt={currentTestimonial.name} 
+                             className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 transform hover:scale-105"
+                           />
+                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+                         </div>
+                         
+                         <div className="absolute -bottom-6 -right-6 bg-white p-6 shadow-xl hidden md:block z-20">
+                            <div className="border border-black p-4 text-center min-w-[120px]">
+                               <span className="block text-4xl font-serif text-primary">{currentTestimonial.rating.toFixed(1)}</span>
+                               <div className="flex justify-center gap-1 my-1">
+                                  {[...Array(5)].map((_, i) => (
+                                      <Star key={i} size={10} className="fill-secondary text-secondary" />
+                                  ))}
+                               </div>
+                               <span className="text-[10px] uppercase tracking-widest text-gray-500">Avaliação</span>
+                            </div>
+                         </div>
+                      </div>
+
+                      {/* Quote Content */}
+                      <div className="space-y-8 relative px-4 md:px-0">
+                          <div className="absolute -right-4 top-1/2 -translate-y-1/2 flex-col gap-4 hidden lg:flex">
+                              <button onClick={prevSlide} className="p-2 rounded-full border border-gray-700 hover:border-secondary hover:text-secondary transition-colors">
+                                  <ChevronLeft size={20} />
+                              </button>
+                              <button onClick={nextSlide} className="p-2 rounded-full border border-gray-700 hover:border-secondary hover:text-secondary transition-colors">
+                                  <ChevronRight size={20} />
+                              </button>
+                          </div>
+
+                          <div className={`transition-all duration-500 transform ${isAnimating ? 'translate-x-4 opacity-0' : 'translate-x-0 opacity-100'}`}>
+                              <div className="relative">
+                                 <Quote className="text-secondary w-12 h-12 absolute -top-8 -left-6 opacity-30" />
+                                 <p className="font-serif text-xl md:text-3xl italic leading-relaxed text-gray-200">
+                                   "{currentTestimonial.text}"
+                                 </p>
+                                 
+                                 <div className="mt-8 flex items-center gap-4">
+                                    <div className="w-12 h-[1px] bg-secondary"></div>
+                                    <div>
+                                        <h4 className="font-bold text-lg text-white">{currentTestimonial.name}</h4>
+                                        <span className="text-xs text-gray-500 uppercase tracking-widest">{currentTestimonial.role}</span>
+                                    </div>
+                                 </div>
+                              </div>
+                          </div>
+
+                          <div className="flex gap-3 pt-4">
+                             {testimonialsData.map((_, index) => (
+                                 <button 
+                                   key={index}
+                                   onClick={() => goToSlide(index)}
+                                   className={`h-2 rounded-full transition-all duration-300 ${
+                                     currentIndex === index ? 'w-8 bg-secondary' : 'w-2 bg-gray-700 hover:bg-gray-500'
+                                   }`}
+                                   aria-label={`Ir para depoimento ${index + 1}`}
+                                 />
+                             ))}
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* Mobile Navigation */}
+                  <div className="flex justify-between mt-8 md:hidden px-4">
+                       <button onClick={prevSlide} className="p-3 rounded-full bg-gray-800 text-white hover:bg-secondary transition-colors">
+                          <ChevronLeft size={20} />
+                       </button>
+                       <button onClick={nextSlide} className="p-3 rounded-full bg-gray-800 text-white hover:bg-secondary transition-colors">
+                          <ChevronRight size={20} />
+                       </button>
+                  </div>
+              </div>
+
+            </div>
+          </section>
+        );
+      };
+
+      // Componente: Contact
+      const Contact = () => {
+        return (
+          <section id="contact" className="py-24 bg-accent/20 relative scroll-mt-28">
+            <div className="max-w-4xl mx-auto px-4 text-center">
+              
+              <div className="animate-on-scroll opacity-0">
+                <h3 className="font-sans text-xs font-bold tracking-[0.3em] uppercase mb-4 text-gray-500">Agendamento</h3>
+                <h2 className="font-serif text-4xl md:text-5xl text-primary mb-6">Faça seu <span className="text-secondary">Agendamento</span></h2>
+                <p className="font-sans text-gray-600 mb-10 max-w-xl mx-auto">
+                   Escolha o melhor horário para você. Atendemos com hora marcada para garantir sua exclusividade e segurança.
+                </p>
+
+                <a 
+                  href="#" 
+                  className="inline-block bg-white border border-gray-300 text-primary hover:border-black hover:bg-primary hover:text-white px-12 py-5 uppercase tracking-[0.2em] text-xs font-bold transition-all duration-300 shadow-sm"
+                >
+                  Agendar Online Agora
+                </a>
+                
+                <div className="mt-8 text-sm tracking-widest font-semibold text-primary">
+                   OU PELO WHATSAPP: <span className="border-b border-primary pb-1 cursor-pointer">(11) 99999-9999</span>
+                </div>
+
+                <div className="mt-6 text-sm tracking-widest font-medium text-gray-500">
+                  SIGA NOSSO INSTAGRAM @studioelegance
+                </div>
+
+                <div className="mt-16 pt-10 border-t border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="flex flex-col items-center">
+                       <div className="w-24 h-24 bg-primary text-secondary rounded-full flex items-center justify-center font-serif font-bold text-center p-2 mb-4">
+                          Top<br/>Choice
+                       </div>
+                       <p className="text-xs uppercase tracking-widest text-gray-600">Melhores do Ano 2024</p>
+                    </div>
+                    <div className="flex flex-col items-center">
+                       <div className="w-24 h-24 bg-secondary text-primary rounded-full flex items-center justify-center font-serif font-bold text-center p-2 mb-4">
+                          5 Estrelas
+                       </div>
+                       <p className="text-xs uppercase tracking-widest text-gray-600">Mais agendados</p>
+                    </div>
+                    <div className="flex flex-col items-center">
+                       <div className="w-24 h-24 bg-primary text-secondary rounded-full flex items-center justify-center font-serif font-bold text-center p-2 mb-4">
+                          VIP<br/>Salon
+                       </div>
+                       <p className="text-xs uppercase tracking-widest text-gray-600">Mestre em Design</p>
+                    </div>
+                </div>
+              </div>
+
+            </div>
+          </section>
+        );
+      };
+
+      // Componente: Footer
+      const Footer = () => {
+        return (
+          <footer className="bg-white pt-20 pb-10 border-t border-gray-100">
+            <div className="max-w-7xl mx-auto px-6 text-center">
+              
+              <div className="mb-10">
+                 <h2 className="font-serif text-2xl text-primary font-bold tracking-widest uppercase">Studio <span className="text-secondary">Elegance</span></h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-16 text-xs uppercase tracking-widest text-gray-500 font-medium">
+                 <div>
+                    <h4 className="text-black font-bold mb-4">Endereço</h4>
+                    <p className="mb-1">Av. Principal, 1000 - Sala 202</p>
+                    <p>Centro - Cidade - SP</p>
+                 </div>
+                 
+                 <div>
+                    <h4 className="text-black font-bold mb-4">Contato</h4>
+                    <p className="mb-1">(11) 99999-9999</p>
+                    <p>(11) 98888-8888</p>
+                 </div>
+                 
+                 <div>
+                    <h4 className="text-black font-bold mb-4">Horários</h4>
+                    <p className="mb-1">Seg a Sex: 08:00h às 21:00h</p>
+                    <p>Sábados: 08:00h às 20:00h</p>
+                 </div>
+              </div>
+
+              <div className="flex justify-center gap-6 mb-10">
+                 <a href="#" className="p-3 bg-gray-50 rounded-full hover:bg-black hover:text-white transition-colors"><Instagram size={20} /></a>
+                 <a href="#" className="p-3 bg-gray-50 rounded-full hover:bg-black hover:text-white transition-colors"><Facebook size={20} /></a>
+                 <a href="#" className="p-3 bg-gray-50 rounded-full hover:bg-black hover:text-white transition-colors"><MessageCircle size={20} /></a>
+              </div>
+
+              <div className="border-t border-gray-100 pt-8 text-[10px] text-gray-400 tracking-widest uppercase">
+                <p>&copy; {new Date().getFullYear()} Studio Elegance Beauty Academy. Todos os direitos reservados.</p>
+              </div>
+
+            </div>
+          </footer>
+        );
+      };
+
+      // --- APP PRINCIPAL ---
+      const App = () => {
+        useEffect(() => {
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('fade-in-up');
+                observer.unobserve(entry.target); 
+              }
+            });
+          }, {
+            threshold: 0.1
+          });
+
+          document.querySelectorAll('.animate-on-scroll').forEach((el) => {
+            observer.observe(el);
+          });
+
+          return () => observer.disconnect();
+        }, []);
+
+        return (
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            <main className="flex-grow">
+              <Hero />
+              <Features />
+              <Services />
+              <Gallery />
+              <Testimonials />
+              <Contact />
+            </main>
+            <Footer />
+          </div>
+        );
+      };
+
+      // --- RENDERIZAÇÃO ---
+      const rootElement = document.getElementById('root');
+      const root = ReactDOM.createRoot(rootElement);
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      );
+    </script>
   </body>
 </html>
