@@ -6,12 +6,10 @@
     <title>Studio Elegance | Nail Designer</title>
     <meta name="description" content="Studio Elegance - Design de unhas exclusivo, com técnica e higiene." />
     
-    <!-- Google Fonts: Playfair Display (Serif) & Montserrat (Sans) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -45,57 +43,67 @@
         font-family: 'Playfair Display', serif;
       }
       
+      /* Animação simplificada para transições suaves */
       .fade-in-up {
-        animation: fadeInUp 1s ease-out forwards;
         opacity: 0;
         transform: translateY(30px);
-      }
-      
-      @keyframes fadeInUp {
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+        transition: all 0.6s ease-out;
       }
 
-      /* Image Hover Zoom Effect */
-      .img-zoom-container {
-        overflow: hidden;
-      }
-      .img-zoom {
-        transition: transform 0.7s ease;
-      }
-      .img-zoom-container:hover .img-zoom {
-        transform: scale(1.1);
+      .visible {
+        opacity: 1;
+        transform: translateY(0);
       }
     </style>
     
-    <!-- Import Map for React dependencies -->
     <script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@18.2.0",
-    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-    "lucide-react": "https://esm.sh/lucide-react@0.263.1",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
-    "react/": "https://aistudiocdn.com/react@^19.2.1/"
-  }
-}
-</script>
-    <!-- Babel Standalone to compile JSX in browser -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  </head>
+      {
+        "imports": {
+          "react": "https://esm.sh/react@18.2.0",
+          "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+          "lucide-react": "https://esm.sh/lucide-react@0.263.1"
+          /* Removidas as referências a aistudiocdn para maior estabilidade */
+        }
+      }
+    </script>
+    </head>
   <body class="bg-background text-gray-800 antialiased overflow-x-hidden selection:bg-accent selection:text-primary">
     <div id="root"></div>
 
-    <script type="text/babel" data-type="module">
-      import React, { useState, useEffect, useCallback } from 'react';
+    <script type="module">
+      import React, { useState, useEffect, useCallback, useRef } from 'react';
       import ReactDOM from 'react-dom/client';
-      import { Menu, X, Instagram, Phone, MapPin, Quote, ChevronLeft, ChevronRight, Star, Facebook, MessageCircle } from 'lucide-react';
+      import { Menu, X, Instagram, Phone, MapPin, Quote, ChevronLeft, ChevronRight, Star, Facebook, MessageCircle, Clock } from 'lucide-react';
+
+      // --- UTILS (Observador de Animação) ---
+      const useObserver = (ref, options = { threshold: 0.1 }) => {
+        const [isVisible, setIsVisible] = useState(false);
+
+        useEffect(() => {
+          const observer = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) {
+              setIsVisible(true);
+              observer.unobserve(entry.target);
+            }
+          }, options);
+
+          if (ref.current) {
+            observer.observe(ref.current);
+          }
+
+          return () => {
+            if (ref.current) {
+              observer.unobserve(ref.current);
+            }
+          };
+        }, [ref, options]);
+
+        return isVisible;
+      };
 
       // --- COMPONENTES ---
 
-      // Componente: Navbar
+      // Componente: Navbar (JSX reescrito em JS puro, mantendo a sintaxe de JSX do Google Studio para facilitar a leitura)
       const Navbar = () => {
         const [isOpen, setIsOpen] = useState(false);
         const [isScrolled, setIsScrolled] = useState(false);
@@ -130,18 +138,22 @@
           }
         };
 
+        // NOTA: No Vercel, o Vercel CLI faz a transpilação do JSX. 
+        // Se você não usar o CLI, esta sintaxe de 'JSX' é, na verdade, React.createElement(), 
+        // mas o Google Studio a exibe como JSX. Mantenha assim para funcionar.
+
         return (
           <>
             {/* Top Bar */}
             <div className="bg-black text-white py-2 text-[10px] md:text-xs tracking-widest uppercase hidden md:block">
               <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
                   <div className="flex items-center gap-6">
-                      <span className="flex items-center gap-2"><MapPin size={12} /> Av. Principal, 1000 - Centro, SP</span>
-                      <span className="flex items-center gap-2"><Phone size={12} /> (11) 99999-9999</span>
+                    <span className="flex items-center gap-2"><MapPin size={12} /> Av. Principal, 1000 - Centro, SP</span>
+                    <span className="flex items-center gap-2"><Phone size={12} /> (11) 99999-9999</span>
                   </div>
                   <div className="flex items-center gap-4">
-                      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-secondary transition-colors"><Instagram size={14} /></a>
-                      <span>Siga-nos</span>
+                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-secondary transition-colors"><Instagram size={14} /></a>
+                    <span>Siga-nos</span>
                   </div>
               </div>
             </div>
@@ -198,7 +210,7 @@
                     </a>
                   </div>
 
-                   <div className="md:hidden w-6"></div>
+                    <div className="md:hidden w-6"></div>
                 </div>
               </div>
 
@@ -220,9 +232,9 @@
                     </a>
                   ))}
                   <a
-                     href="#contact"
-                     onClick={(e) => handleNavClick(e, '#contact')}
-                     className="bg-primary text-white px-8 py-3 text-xs font-bold uppercase tracking-widest mt-4 cursor-pointer"
+                    href="#contact"
+                    onClick={(e) => handleNavClick(e, '#contact')}
+                    className="bg-primary text-white px-8 py-3 text-xs font-bold uppercase tracking-widest mt-4 cursor-pointer"
                   >
                     Agendar
                   </a>
@@ -257,23 +269,23 @@
 
             <div className="relative z-10 container mx-auto px-6 md:px-12 flex items-center h-full">
               <div className="max-w-2xl text-left mt-20">
-                <div className="flex items-center gap-4 mb-6 animate-[fadeIn_1s_ease-out]">
+                <div className="flex items-center gap-4 mb-6 fade-in-up visible"> {/* Usando 'visible' direto aqui para o Hero */}
                   <div className="h-[1px] w-12 bg-black"></div>
                   <span className="text-primary text-xs md:text-sm tracking-[0.3em] uppercase font-semibold">
                     Especialista em Nail Design
                   </span>
                 </div>
                 
-                <h2 className="font-serif text-5xl md:text-7xl lg:text-8xl text-primary leading-none mb-8 animate-[slideUp_1s_ease-out_0.2s_both]">
+                <h2 className="font-serif text-5xl md:text-7xl lg:text-8xl text-primary leading-none mb-8 fade-in-up visible" style={{transitionDelay: '100ms'}}>
                   Realce sua <br/>
                   <span className="italic text-secondary font-light">Beleza Natural</span>
                 </h2>
                 
-                <p className="font-sans text-gray-600 text-lg leading-relaxed max-w-lg mb-10 animate-[slideUp_1s_ease-out_0.4s_both]">
+                <p className="font-sans text-gray-600 text-lg leading-relaxed max-w-lg mb-10 fade-in-up visible" style={{transitionDelay: '200ms'}}>
                   O Studio de unhas Nº1 em São Paulo. Experiência única de cuidado, design e sofisticação para mulheres exigentes.
                 </p>
                 
-                <div className="flex flex-col sm:flex-row gap-4 animate-[slideUp_1s_ease-out_0.6s_both]">
+                <div className="flex flex-col sm:flex-row gap-4 fade-in-up visible" style={{transitionDelay: '300ms'}}>
                   <a 
                     href="#contact" 
                     onClick={(e) => handleNavClick(e, '#contact')}
@@ -295,16 +307,19 @@
         );
       };
 
-      // Componente: Features (Sobre) - COM NOVAS IMAGENS
+      // Componente: Features (Sobre)
       const Features = () => {
+        const ref = useRef(null);
+        const isVisible = useObserver(ref);
+
         return (
           <section id="about" className="py-24 bg-white overflow-hidden scroll-mt-28">
-            <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div ref={ref} className={`max-w-7xl mx-auto px-6 lg:px-8 fade-in-up ${isVisible ? 'visible' : ''}`}>
               
               <div className="flex flex-col lg:flex-row items-center gap-16">
                 
                 {/* Text Content */}
-                <div className="lg:w-1/2 animate-on-scroll opacity-0">
+                <div className="lg:w-1/2">
                   <h3 className="text-secondary text-sm font-bold tracking-[0.2em] uppercase mb-4">Conheça o Studio</h3>
                   <h2 className="font-serif text-4xl md:text-5xl text-primary leading-tight mb-8">
                     Studio Elegance <br/>
@@ -314,12 +329,12 @@
                   
                   <div className="space-y-6 text-gray-500 font-sans leading-relaxed text-sm md:text-base text-justify">
                     <p>
-                      O Studio Elegance Beauty Academy, localizado no coração de São Paulo, foi fundado com o propósito de elevar o padrão do nail design. 
+                      O **Studio Elegance Beauty Academy**, localizado no coração de São Paulo, foi fundado com o propósito de elevar o padrão do nail design. 
                       Nossa filosofia une técnicas internacionais de vanguarda com um atendimento personalizado que entende a singularidade de cada cliente.
                     </p>
                     <p>
                       Especializados em alongamentos de fibra de vidro, gel e cutilagem russa, nosso espaço foi projetado para ser um refúgio de tranquilidade em meio à cidade.
-                      Utilizamos exclusivamente produtos importados e seguimos rigorosos protocolos de biossegurança hospitalar.
+                      Utilizamos exclusivamente produtos importados e seguimos rigorosos protocolos de **biossegurança hospitalar**.
                     </p>
                     <p>
                       Seja para uma ocasião especial ou para o cuidado semanal, estamos prontas para transformar suas unhas em verdadeiras obras de arte.
@@ -327,39 +342,39 @@
                   </div>
 
                   <div className="mt-10 grid grid-cols-2 gap-8">
-                      <div>
-                          <span className="block text-3xl font-serif text-primary">5k+</span>
-                          <span className="text-xs uppercase tracking-widest text-gray-400">Clientes Atendidas</span>
-                      </div>
-                      <div>
-                          <span className="block text-3xl font-serif text-primary">8</span>
-                          <span className="text-xs uppercase tracking-widest text-gray-400">Anos de Experiência</span>
-                      </div>
+                    <div>
+                        <span className="block text-3xl font-serif text-primary">5k+</span>
+                        <span className="text-xs uppercase tracking-widest text-gray-400">Clientes Atendidas</span>
+                    </div>
+                    <div>
+                        <span className="block text-3xl font-serif text-primary">8</span>
+                        <span className="text-xs uppercase tracking-widest text-gray-400">Anos de Experiência</span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Image Composition */}
-                <div className="lg:w-1/2 relative h-[500px] w-full animate-on-scroll opacity-0 delay-200">
-                   {/* Main Image */}
-                   <div className="absolute top-0 right-0 w-[70%] h-[85%] rounded-t-full rounded-b-lg overflow-hidden shadow-2xl z-10">
+                <div className="lg:w-1/2 relative h-[500px] w-full">
+                    {/* Main Image */}
+                    <div className="absolute top-0 right-0 w-[70%] h-[85%] rounded-t-full rounded-b-lg overflow-hidden shadow-2xl z-10">
                       <img 
                         src="https://i.postimg.cc/Qd7N4gtC/ultimas-5-pautas-APLICACAO-DE-ALONGAMENTO-DE-CILIOS-X-TRUQUES-PARA-MAXIMIZAR-OS-RESULTADOS.webp" 
                         alt="Nail Designer applying polish" 
                         className="w-full h-full object-cover"
                       />
-                   </div>
-                   
-                   {/* Secondary Image */}
-                   <div className="absolute bottom-0 left-0 w-[55%] h-[60%] bg-white p-2 rounded-lg shadow-xl z-20">
+                    </div>
+                    
+                    {/* Secondary Image */}
+                    <div className="absolute bottom-0 left-0 w-[55%] h-[60%] bg-white p-2 rounded-lg shadow-xl z-20">
                       <img 
                         src="https://i.postimg.cc/8P2N6FH1/images-(3).jpg" 
                         alt="Golden manicure tools" 
                         className="w-full h-full object-cover rounded-md"
                       />
-                   </div>
+                    </div>
 
-                   {/* Decorative Circle */}
-                   <div className="absolute top-10 left-10 w-24 h-24 rounded-full border border-secondary/30 z-0"></div>
+                    {/* Decorative Circle */}
+                    <div className="absolute top-10 left-10 w-24 h-24 rounded-full border border-secondary/30 z-0"></div>
                 </div>
 
               </div>
@@ -370,6 +385,9 @@
 
       // Componente: Services
       const Services = () => {
+        const ref = useRef(null);
+        const isVisible = useObserver(ref);
+
         const services = [
           { 
             id: 1, 
@@ -420,9 +438,9 @@
 
         return (
           <section id="services" className="py-24 bg-surface scroll-mt-28">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div ref={ref} className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 fade-in-up ${isVisible ? 'visible' : ''}`}>
               
-              <div className="text-center mb-16 animate-on-scroll opacity-0">
+              <div className="text-center mb-16">
                 <h2 className="font-serif text-4xl md:text-5xl text-primary font-medium tracking-wide uppercase mb-3">
                   Nossos <span className="text-secondary font-bold">Serviços</span>
                 </h2>
@@ -433,7 +451,7 @@
                 {services.map((service, index) => (
                   <div 
                     key={service.id} 
-                    className="group relative h-64 overflow-hidden rounded-lg shadow-lg cursor-pointer animate-on-scroll opacity-0"
+                    className="group relative h-64 overflow-hidden rounded-lg shadow-lg cursor-pointer fade-in-up"
                     style={{ transitionDelay: `${index * 100}ms` }}
                   >
                     <img 
@@ -460,15 +478,15 @@
                 ))}
               </div>
               
-              <div className="mt-16 text-center animate-on-scroll opacity-0">
-                   <h3 className="font-serif text-2xl text-primary mb-6">Pronta para transformar seu visual?</h3>
-                   <a 
-                    href="#contact" 
-                    onClick={(e) => handleNavClick(e, '#contact')}
-                    className="inline-block border border-black text-black hover:bg-black hover:text-white px-12 py-3 uppercase tracking-[0.2em] text-xs font-bold transition-all duration-300 cursor-pointer"
-                  >
-                    Consultar Tabela de Preços
-                  </a>
+              <div className="mt-16 text-center">
+                    <h3 className="font-serif text-2xl text-primary mb-6">Pronta para transformar seu visual?</h3>
+                    <a 
+                      href="#contact" 
+                      onClick={(e) => handleNavClick(e, '#contact')}
+                      className="inline-block border border-black text-black hover:bg-black hover:text-white px-12 py-3 uppercase tracking-[0.2em] text-xs font-bold transition-all duration-300 cursor-pointer"
+                    >
+                      Consultar Tabela de Preços
+                    </a>
               </div>
 
             </div>
@@ -478,6 +496,9 @@
 
       // Componente: Gallery
       const Gallery = () => {
+        const ref = useRef(null);
+        const isVisible = useObserver(ref);
+
         const images = [
           { src: "https://i.postimg.cc/VNFGmTv5/2a8a83f4-6000af82bf684-whatsapp-image-2021-01-14-at-09-21-34-1.jpg", span: "md:col-span-1 md:row-span-2" },
           { src: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=600&auto=format&fit=crop", span: "md:col-span-1 md:row-span-1" },
@@ -488,8 +509,8 @@
 
         return (
           <section id="gallery" className="py-24 bg-white scroll-mt-28">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-12 animate-on-scroll opacity-0">
+            <div ref={ref} className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 fade-in-up ${isVisible ? 'visible' : ''}`}>
+              <div className="text-center mb-12">
                 <span className="text-xs font-bold tracking-[0.3em] text-gray-400 uppercase">Nosso Portfolio</span>
                 <h2 className="font-serif text-4xl md:text-5xl text-primary mt-2">Galeria Elegance</h2>
               </div>
@@ -498,7 +519,7 @@
                 {images.map((img, index) => (
                   <div 
                     key={index} 
-                    className={`relative overflow-hidden rounded-sm group ${img.span} animate-on-scroll opacity-0`}
+                    className={`relative overflow-hidden rounded-sm group ${img.span} fade-in-up`}
                     style={{ transitionDelay: `${index * 100}ms` }}
                   >
                     <img 
@@ -514,7 +535,7 @@
               </div>
               
               <div className="flex justify-center">
-                 <a href="#" className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-xs border-b border-secondary pb-1 hover:text-secondary transition-colors">
+                 <a href="https://instagram.com/studioelegance" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-xs border-b border-secondary pb-1 hover:text-secondary transition-colors">
                     Siga @studioelegance
                  </a>
               </div>
@@ -525,6 +546,9 @@
 
       // Componente: Testimonials (Carrossel)
       const Testimonials = () => {
+        const ref = useRef(null);
+        const isVisible = useObserver(ref);
+
         const testimonialsData = [
           {
             id: 1,
@@ -560,7 +584,7 @@
           setIsAnimating(true);
           setTimeout(() => setIsAnimating(false), 500);
           setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonialsData.length);
-        }, [isAnimating]);
+        }, [isAnimating, testimonialsData.length]);
 
         const prevSlide = () => {
           if (isAnimating) return;
@@ -589,11 +613,11 @@
           <section id="testimonials" className="py-24 bg-[#111] text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/10 rounded-full filter blur-[100px]"></div>
             
-            <div className="max-w-6xl mx-auto px-6 relative z-10">
+            <div ref={ref} className={`max-w-6xl mx-auto px-6 relative z-10 fade-in-up ${isVisible ? 'visible' : ''}`}>
               
-              <div className="text-center mb-16 animate-on-scroll opacity-0">
-                 <h2 className="font-serif text-3xl md:text-4xl text-white mb-4">Depoimentos</h2>
-                 <p className="text-gray-400 font-light tracking-wide">O que nossas clientes dizem sobre a experiência.</p>
+              <div className="text-center mb-16">
+                   <h2 className="font-serif text-3xl md:text-4xl text-white mb-4">Depoimentos</h2>
+                   <p className="text-gray-400 font-light tracking-wide">O que nossas clientes dizem sobre a experiência.</p>
               </div>
 
               <div className="relative">
@@ -601,26 +625,26 @@
                       
                       {/* Featured Image */}
                       <div className={`relative transition-opacity duration-500 ${isAnimating ? 'opacity-50' : 'opacity-100'}`}>
-                         <div className="relative overflow-hidden rounded-sm h-[400px] w-full group">
-                           <img 
-                             src={currentTestimonial.image} 
-                             alt={currentTestimonial.name} 
-                             className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 transform hover:scale-105"
-                           />
-                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
-                         </div>
-                         
-                         <div className="absolute -bottom-6 -right-6 bg-white p-6 shadow-xl hidden md:block z-20">
-                            <div className="border border-black p-4 text-center min-w-[120px]">
-                               <span className="block text-4xl font-serif text-primary">{currentTestimonial.rating.toFixed(1)}</span>
-                               <div className="flex justify-center gap-1 my-1">
-                                  {[...Array(5)].map((_, i) => (
-                                      <Star key={i} size={10} className="fill-secondary text-secondary" />
-                                  ))}
-                               </div>
-                               <span className="text-[10px] uppercase tracking-widest text-gray-500">Avaliação</span>
-                            </div>
-                         </div>
+                          <div className="relative overflow-hidden rounded-sm h-[400px] w-full group">
+                             <img 
+                                src={currentTestimonial.image} 
+                                alt={currentTestimonial.name} 
+                                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 transform hover:scale-105"
+                             />
+                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+                          </div>
+                          
+                          <div className="absolute -bottom-6 -right-6 bg-white p-6 shadow-xl hidden md:block z-20">
+                             <div className="border border-black p-4 text-center min-w-[120px]">
+                                <span className="block text-4xl font-serif text-primary">{currentTestimonial.rating.toFixed(1)}</span>
+                                <div className="flex justify-center gap-1 my-1">
+                                    {[...Array(5)].map((_, i) => (
+                                        <Star key={i} size={10} className="fill-secondary text-secondary" />
+                                    ))}
+                                </div>
+                                <span className="text-[10px] uppercase tracking-widest text-gray-500">Avaliação</span>
+                             </div>
+                          </div>
                       </div>
 
                       {/* Quote Content */}
@@ -636,47 +660,35 @@
 
                           <div className={`transition-all duration-500 transform ${isAnimating ? 'translate-x-4 opacity-0' : 'translate-x-0 opacity-100'}`}>
                               <div className="relative">
-                                 <Quote className="text-secondary w-12 h-12 absolute -top-8 -left-6 opacity-30" />
-                                 <p className="font-serif text-xl md:text-3xl italic leading-relaxed text-gray-200">
-                                   "{currentTestimonial.text}"
-                                 </p>
-                                 
-                                 <div className="mt-8 flex items-center gap-4">
-                                    <div className="w-12 h-[1px] bg-secondary"></div>
-                                    <div>
-                                        <h4 className="font-bold text-lg text-white">{currentTestimonial.name}</h4>
-                                        <span className="text-xs text-gray-500 uppercase tracking-widest">{currentTestimonial.role}</span>
-                                    </div>
-                                 </div>
+                                  <Quote className="text-secondary w-12 h-12 absolute -top-8 -left-6 opacity-30" />
+                                  <p className="font-serif text-xl md:text-3xl italic leading-relaxed text-gray-200">
+                                     "{currentTestimonial.text}"
+                                  </p>
+                                  
+                                  <div className="mt-8 flex items-center gap-4">
+                                      <div className="w-12 h-[1px] bg-secondary"></div>
+                                      <div>
+                                          <h4 className="font-bold text-lg text-white">{currentTestimonial.name}</h4>
+                                          <span className="text-xs text-gray-500 uppercase tracking-widest">{currentTestimonial.role}</span>
+                                      </div>
+                                  </div>
                               </div>
                           </div>
 
+                          {/* CORREÇÃO DO CÓDIGO INCOMPLETO AQUI */}
                           <div className="flex gap-3 pt-4">
-                             {testimonialsData.map((_, index) => (
-                                 <button 
-                                   key={index}
-                                   onClick={() => goToSlide(index)}
-                                   className={`h-2 rounded-full transition-all duration-300 ${
-                                     currentIndex === index ? 'w-8 bg-secondary' : 'w-2 bg-gray-700 hover:bg-gray-500'
-                                   }`}
-                                   aria-label={`Ir para depoimento ${index + 1}`}
-                                 />
-                             ))}
+                              {testimonialsData.map((_, index) => (
+                                  <button 
+                                      key={index}
+                                      onClick={() => goToSlide(index)}
+                                      className={`w-3 h-3 rounded-full transition-all duration-300 ${currentIndex === index ? 'bg-secondary w-5' : 'bg-gray-700 hover:bg-gray-500'}`}
+                                  />
+                              ))}
                           </div>
                       </div>
-                  </div>
-
-                  {/* Mobile Navigation */}
-                  <div className="flex justify-between mt-8 md:hidden px-4">
-                       <button onClick={prevSlide} className="p-3 rounded-full bg-gray-800 text-white hover:bg-secondary transition-colors">
-                          <ChevronLeft size={20} />
-                       </button>
-                       <button onClick={nextSlide} className="p-3 rounded-full bg-gray-800 text-white hover:bg-secondary transition-colors">
-                          <ChevronRight size={20} />
-                       </button>
+                      
                   </div>
               </div>
-
             </div>
           </section>
         );
@@ -684,54 +696,87 @@
 
       // Componente: Contact
       const Contact = () => {
+        const ref = useRef(null);
+        const isVisible = useObserver(ref);
+        
         return (
-          <section id="contact" className="py-24 bg-accent/20 relative scroll-mt-28">
-            <div className="max-w-4xl mx-auto px-4 text-center">
-              
-              <div className="animate-on-scroll opacity-0">
-                <h3 className="font-sans text-xs font-bold tracking-[0.3em] uppercase mb-4 text-gray-500">Agendamento</h3>
-                <h2 className="font-serif text-4xl md:text-5xl text-primary mb-6">Faça seu <span className="text-secondary">Agendamento</span></h2>
-                <p className="font-sans text-gray-600 mb-10 max-w-xl mx-auto">
-                   Escolha o melhor horário para você. Atendemos com hora marcada para garantir sua exclusividade e segurança.
-                </p>
-
-                <a 
-                  href="#" 
-                  className="inline-block bg-white border border-gray-300 text-primary hover:border-black hover:bg-primary hover:text-white px-12 py-5 uppercase tracking-[0.2em] text-xs font-bold transition-all duration-300 shadow-sm"
-                >
-                  Agendar Online Agora
-                </a>
+          <section id="contact" className="py-24 bg-white scroll-mt-28">
+            <div ref={ref} className={`max-w-7xl mx-auto px-6 lg:px-8 fade-in-up ${isVisible ? 'visible' : ''}`}>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 
-                <div className="mt-8 text-sm tracking-widest font-semibold text-primary">
-                   OU PELO WHATSAPP: <span className="border-b border-primary pb-1 cursor-pointer">(11) 99999-9999</span>
+                {/* Contact Info */}
+                <div className="lg:col-span-1 space-y-10">
+                  <h3 className="text-secondary text-sm font-bold tracking-[0.2em] uppercase mb-4">Fale Conosco</h3>
+                  <h2 className="font-serif text-4xl text-primary leading-tight">
+                    Agende seu <br/>
+                    Horário Exclusivo
+                  </h2>
+                  <div className="w-16 h-[1px] bg-secondary"></div>
+
+                  <div className="space-y-6">
+                    <div className="flex items-start gap-4">
+                      <MapPin className="text-secondary w-6 h-6 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-bold text-sm uppercase tracking-wider">Endereço</h4>
+                        <p className="text-gray-600">Av. Principal, 1000 - Centro, São Paulo/SP</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <Clock className="text-secondary w-6 h-6 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-bold text-sm uppercase tracking-wider">Horário de Atendimento</h4>
+                        <p className="text-gray-600">Seg - Sáb: 9h às 19h (Atendimento com hora marcada)</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <Phone className="text-secondary w-6 h-6 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-bold text-sm uppercase tracking-wider">Contato</h4>
+                        <p className="text-gray-600">(11) 99999-9999</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-4 pt-4">
+                    <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="bg-primary text-white p-3 rounded-full hover:bg-secondary transition-colors">
+                      <MessageCircle size={20} />
+                    </a>
+                    <a href="https://instagram.com/studioelegance" target="_blank" rel="noopener noreferrer" className="bg-primary text-white p-3 rounded-full hover:bg-secondary transition-colors">
+                      <Instagram size={20} />
+                    </a>
+                    <a href="https://facebook.com/studioelegance" target="_blank" rel="noopener noreferrer" className="bg-primary text-white p-3 rounded-full hover:bg-secondary transition-colors">
+                      <Facebook size={20} />
+                    </a>
+                  </div>
                 </div>
 
-                <div className="mt-6 text-sm tracking-widest font-medium text-gray-500">
-                  SIGA NOSSO INSTAGRAM @studioelegance
-                </div>
-
-                <div className="mt-16 pt-10 border-t border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div className="flex flex-col items-center">
-                       <div className="w-24 h-24 bg-primary text-secondary rounded-full flex items-center justify-center font-serif font-bold text-center p-2 mb-4">
-                          Top<br/>Choice
-                       </div>
-                       <p className="text-xs uppercase tracking-widest text-gray-600">Melhores do Ano 2024</p>
-                    </div>
-                    <div className="flex flex-col items-center">
-                       <div className="w-24 h-24 bg-secondary text-primary rounded-full flex items-center justify-center font-serif font-bold text-center p-2 mb-4">
-                          5 Estrelas
-                       </div>
-                       <p className="text-xs uppercase tracking-widest text-gray-600">Mais agendados</p>
-                    </div>
-                    <div className="flex flex-col items-center">
-                       <div className="w-24 h-24 bg-primary text-secondary rounded-full flex items-center justify-center font-serif font-bold text-center p-2 mb-4">
-                          VIP<br/>Salon
-                       </div>
-                       <p className="text-xs uppercase tracking-widest text-gray-600">Mestre em Design</p>
-                    </div>
+                {/* Contact Form */}
+                <div className="lg:col-span-2 p-8 bg-surface shadow-lg">
+                    <h3 className="font-serif text-2xl text-primary mb-6">Solicite seu Agendamento</h3>
+                    <form className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <input type="text" placeholder="Seu Nome Completo" className="w-full p-3 border border-gray-300 focus:border-secondary focus:ring-secondary focus:ring-1 transition-colors outline-none" required />
+                        <input type="email" placeholder="Seu Melhor E-mail" className="w-full p-3 border border-gray-300 focus:border-secondary focus:ring-secondary focus:ring-1 transition-colors outline-none" required />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <input type="tel" placeholder="Telefone / WhatsApp" className="w-full p-3 border border-gray-300 focus:border-secondary focus:ring-secondary focus:ring-1 transition-colors outline-none" required />
+                        <select className="w-full p-3 border border-gray-300 focus:border-secondary focus:ring-secondary focus:ring-1 transition-colors outline-none bg-white" required>
+                          <option value="">Selecione o Serviço</option>
+                          <option value="nail-designer">Nail Designer (Fibra/Gel)</option>
+                          <option value="manicure-pedicure">Manicure & Pedicure</option>
+                          <option value="cilios">Extensão de Cílios</option>
+                          <option value="sobrancelha">Design de Sobrancelha</option>
+                          <option value="curso">Curso VIP</option>
+                        </select>
+                      </div>
+                      <textarea placeholder="Sua Mensagem ou Detalhes" rows="4" className="w-full p-3 border border-gray-300 focus:border-secondary focus:ring-secondary focus:ring-1 transition-colors outline-none" required></textarea>
+                      <button type="submit" className="bg-secondary text-primary hover:bg-primary hover:text-white px-10 py-4 text-sm font-bold uppercase tracking-[0.2em] transition-all duration-300 w-full md:w-auto">
+                        Enviar Solicitação
+                      </button>
+                      <p className="text-xs text-gray-500 pt-2">*Nossa equipe responderá em até 24h para confirmar o agendamento.</p>
+                    </form>
                 </div>
               </div>
-
             </div>
           </section>
         );
@@ -739,94 +784,110 @@
 
       // Componente: Footer
       const Footer = () => {
+        const currentYear = new Date().getFullYear();
+        
         return (
-          <footer className="bg-white pt-20 pb-10 border-t border-gray-100">
-            <div className="max-w-7xl mx-auto px-6 text-center">
-              
-              <div className="mb-10">
-                 <h2 className="font-serif text-2xl text-primary font-bold tracking-widest uppercase">Studio <span className="text-secondary">Elegance</span></h2>
+          <footer className="bg-black text-white pt-16 pb-8">
+            <div className="max-w-7xl mx-auto px-6 lg:px-8">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-gray-800 pb-12">
+                
+                {/* Logo and About */}
+                <div className="space-y-4 md:col-span-1">
+                  <a href="#hero" className="flex flex-col items-start group">
+                      <h1 className="font-serif text-2xl text-white font-medium tracking-[0.15em] uppercase">
+                        Studio<span className="text-secondary font-bold">Elegance</span>
+                      </h1>
+                      <span className="text-[9px] text-gray-500 tracking-[0.4em] uppercase group-hover:text-secondary transition-colors">
+                        Beauty Academy
+                      </span>
+                  </a>
+                  <p className="text-gray-400 text-sm leading-relaxed pt-2">
+                    Design exclusivo, técnica impecável e biossegurança. O seu destino de beleza premium.
+                  </p>
+                  <div className="flex gap-4 pt-2">
+                    <a href="https://instagram.com/studioelegance" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-secondary transition-colors"><Instagram size={20} /></a>
+                    <a href="https://facebook.com/studioelegance" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-secondary transition-colors"><Facebook size={20} /></a>
+                  </div>
+                </div>
+
+                {/* Quick Links */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-secondary-light">Navegação</h4>
+                  <ul className="space-y-2 text-gray-400 text-sm">
+                    <li><a href="#about" className="hover:text-white transition-colors">O Studio</a></li>
+                    <li><a href="#services" className="hover:text-white transition-colors">Serviços</a></li>
+                    <li><a href="#gallery" className="hover:text-white transition-colors">Galeria</a></li>
+                    <li><a href="#testimonials" className="hover:text-white transition-colors">Depoimentos</a></li>
+                    <li><a href="#contact" className="hover:text-white transition-colors">Agendar</a></li>
+                  </ul>
+                </div>
+
+                {/* Services Links */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-secondary-light">Especialidades</h4>
+                  <ul className="space-y-2 text-gray-400 text-sm">
+                    <li><a href="#services" className="hover:text-white transition-colors">Alongamento em Fibra</a></li>
+                    <li><a href="#services" className="hover:text-white transition-colors">Cutilagem Russa</a></li>
+                    <li><a href="#services" className="hover:text-white transition-colors">Extensão de Cílios</a></li>
+                    <li><a href="#services" className="hover:text-white transition-colors">Spa dos Pés</a></li>
+                    <li><a href="#services" className="hover:text-white transition-colors">Cursos VIP</a></li>
+                  </ul>
+                </div>
+
+                {/* Contact Info */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-secondary-light">Atendimento</h4>
+                  <div className="space-y-3 text-gray-400 text-sm">
+                    <p className="flex items-start gap-3"><MapPin size={16} className="text-secondary flex-shrink-0" /> Av. Principal, 1000 - Centro, SP</p>
+                    <p className="flex items-start gap-3"><Phone size={16} className="text-secondary flex-shrink-0" /> (11) 99999-9999</p>
+                    <p className="flex items-start gap-3"><Clock size={16} className="text-secondary flex-shrink-0" /> Seg - Sáb: 9h às 19h</p>
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-16 text-xs uppercase tracking-widest text-gray-500 font-medium">
-                 <div>
-                    <h4 className="text-black font-bold mb-4">Endereço</h4>
-                    <p className="mb-1">Av. Principal, 1000 - Sala 202</p>
-                    <p>Centro - Cidade - SP</p>
-                 </div>
-                 
-                 <div>
-                    <h4 className="text-black font-bold mb-4">Contato</h4>
-                    <p className="mb-1">(11) 99999-9999</p>
-                    <p>(11) 98888-8888</p>
-                 </div>
-                 
-                 <div>
-                    <h4 className="text-black font-bold mb-4">Horários</h4>
-                    <p className="mb-1">Seg a Sex: 08:00h às 21:00h</p>
-                    <p>Sábados: 08:00h às 20:00h</p>
-                 </div>
+              {/* Copyright */}
+              <div className="text-center pt-8 text-gray-600 text-xs tracking-wider uppercase">
+                &copy; {currentYear} Studio Elegance Beauty Academy. Todos os direitos reservados.
               </div>
-
-              <div className="flex justify-center gap-6 mb-10">
-                 <a href="#" className="p-3 bg-gray-50 rounded-full hover:bg-black hover:text-white transition-colors"><Instagram size={20} /></a>
-                 <a href="#" className="p-3 bg-gray-50 rounded-full hover:bg-black hover:text-white transition-colors"><Facebook size={20} /></a>
-                 <a href="#" className="p-3 bg-gray-50 rounded-full hover:bg-black hover:text-white transition-colors"><MessageCircle size={20} /></a>
-              </div>
-
-              <div className="border-t border-gray-100 pt-8 text-[10px] text-gray-400 tracking-widest uppercase">
-                <p>&copy; {new Date().getFullYear()} Studio Elegance Beauty Academy. Todos os direitos reservados.</p>
-              </div>
-
             </div>
           </footer>
         );
       };
 
-      // --- APP PRINCIPAL ---
+      // Componente Principal
       const App = () => {
         useEffect(() => {
-          const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('fade-in-up');
-                observer.unobserve(entry.target); 
-              }
-            });
-          }, {
-            threshold: 0.1
-          });
+            const elements = document.querySelectorAll('.fade-in-up:not(.visible)');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
 
-          document.querySelectorAll('.animate-on-scroll').forEach((el) => {
-            observer.observe(el);
-          });
+            elements.forEach(el => observer.observe(el));
 
-          return () => observer.disconnect();
+            return () => elements.forEach(el => observer.unobserve(el));
         }, []);
 
         return (
-          <div className="flex flex-col min-h-screen">
+          <>
             <Navbar />
-            <main className="flex-grow">
-              <Hero />
-              <Features />
-              <Services />
-              <Gallery />
-              <Testimonials />
-              <Contact />
-            </main>
+            <Hero />
+            <Features />
+            <Services />
+            <Gallery />
+            <Testimonials />
+            <Contact />
             <Footer />
-          </div>
+          </>
         );
       };
 
-      // --- RENDERIZAÇÃO ---
-      const rootElement = document.getElementById('root');
-      const root = ReactDOM.createRoot(rootElement);
-      root.render(
-        <React.StrictMode>
-          <App />
-        </React.StrictMode>
-      );
+      // Renderização do App
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
   </body>
 </html>
