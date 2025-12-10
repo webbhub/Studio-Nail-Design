@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Instagram, Phone, MapPin } from 'lucide-react';
-import { NavItem } from '../types';
+
+interface NavItem {
+  label: string;
+  href: string;
+}
 
 const navItems: NavItem[] = [
   { label: 'Início', href: '#hero' },
